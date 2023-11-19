@@ -1,6 +1,6 @@
 {
     "name": "paperedflip",
-    "version": "2.0.8",
+    "version": "2.0.9",
     "main": "dist/js/page-flip.browser.js",
     "browser": "dist/js/page-flip.browser.js",
     "author": "",
