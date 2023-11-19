@@ -59,7 +59,7 @@ export class Flip {
 
     /**
      * Called when the page folding (User drags page corner)
-     *
+     * 
      * @param globalPos - Touch Point Coordinates (relative window)
      */
     public fold(globalPos: Point): void {
@@ -73,12 +73,10 @@ export class Flip {
 
     /**
      * Page turning with animation
-     *
+     * 
      * @param globalPos - Touch Point Coordinates (relative window)
      */
     public flip(globalPos: Point): void {
-        if (this.app.getSettings().disableFlipByClick && !this.isPointOnCorners(globalPos)) return;
-
         // the flipiing process is already running
         if (this.calc !== null) this.render.finishAnimation();
 
@@ -110,9 +108,9 @@ export class Flip {
 
     /**
      * Start the flipping process. Find direction and corner of flipping. Creating an object for calculation.
-     *
+     * 
      * @param {Point} globalPos - Touch Point Coordinates (relative window)
-     *
+     * 
      * @returns {boolean} True if flipping is possible, false otherwise
      */
     public start(globalPos: Point): boolean {
@@ -120,7 +118,7 @@ export class Flip {
 
         const bookPos = this.render.convertToBook(globalPos);
         const rect = this.getBoundsRect();
-
+        
         // Find the direction of flipping
         const direction = this.getDirectionByPoint(bookPos);
 
@@ -172,14 +170,13 @@ export class Flip {
 
     /**
      * Perform calculations for the current page position. Pass data to render object
-     *
+     * 
      * @param {Point} pagePos - Touch Point Coordinates (relative active page)
      */
     private do(pagePos: Point): void {
         if (this.calc === null) return; // Flipping process not started
 
-        if (this.calc.calc(pagePos)) {
-            // Perform calculations for a specific position
+        if (this.calc.calc(pagePos)) { // Perform calculations for a specific position
             const progress = this.calc.getFlippingProgress();
 
             this.bottomPage.setArea(this.calc.getBottomClipArea());
@@ -242,7 +239,7 @@ export class Flip {
      */
     public flipNext(corner: FlipCorner): void {
         this.flip({
-            x: this.render.getRect().left + this.render.getRect().pageWidth * 2 - 10,
+            x: this.render.getRect().left + this.render.getRect().pageWidth * 2,
             y: corner === FlipCorner.TOP ? 1 : this.render.getRect().height - 2,
         });
     }
@@ -277,8 +274,8 @@ export class Flip {
     /**
      * Fold the corners of the book when the mouse pointer is over them.
      * Called when the mouse pointer is over the book without clicking
-     *
-     * @param globalPos
+     * 
+     * @param globalPos 
      */
     public showCorner(globalPos: Point): void {
         if (!this.checkState(FlippingState.READ, FlippingState.FOLD_CORNER)) return;
@@ -286,7 +283,19 @@ export class Flip {
         const rect = this.getBoundsRect();
         const pageWidth = rect.pageWidth;
 
-        if (this.isPointOnCorners(globalPos)) {
+        // folding angle length
+        const operatingDistance = Math.sqrt(Math.pow(pageWidth, 2) + Math.pow(rect.height, 2)) / 5;
+
+        const bookPos = this.render.convertToBook(globalPos);
+
+        if (
+            bookPos.x > 0 &&
+            bookPos.y > 0 &&
+            bookPos.x < rect.width &&
+            bookPos.y < rect.height &&
+            (bookPos.x < operatingDistance || bookPos.x > rect.width - operatingDistance) &&
+            (bookPos.y < operatingDistance || bookPos.y > rect.height - operatingDistance)
+        ) {
             if (this.calc === null) {
                 if (!this.start(globalPos)) return;
 
@@ -321,7 +330,7 @@ export class Flip {
 
     /**
      * Starting the flipping animation process
-     *
+     * 
      * @param {Point} start - animation start point
      * @param {Point} dest - animation end point
      * @param {boolean} isTurned - will the page turn over, or just bring it back
@@ -384,7 +393,7 @@ export class Flip {
 
     private getDirectionByPoint(touchPos: Point): FlipDirection {
         const rect = this.getBoundsRect();
-
+        
         if (this.render.getOrientation() === Orientation.PORTRAIT) {
             if (touchPos.x - rect.pageWidth <= rect.width / 5) {
                 return FlipDirection.BACK;
@@ -427,23 +436,5 @@ export class Flip {
         }
 
         return false;
-    }
-
-    private isPointOnCorners(globalPos: Point): boolean {
-        const rect = this.getBoundsRect();
-        const pageWidth = rect.pageWidth;
-
-        const operatingDistance = Math.sqrt(Math.pow(pageWidth, 2) + Math.pow(rect.height, 2)) / 5;
-
-        const bookPos = this.render.convertToBook(globalPos);
-
-        return (
-            bookPos.x > 0 &&
-            bookPos.y > 0 &&
-            bookPos.x < rect.width &&
-            bookPos.y < rect.height &&
-            (bookPos.x < operatingDistance || bookPos.x > rect.width - operatingDistance) &&
-            (bookPos.y < operatingDistance || bookPos.y > rect.height - operatingDistance)
-        );
     }
 }

@@ -22,10 +22,6 @@ export class CanvasRender extends Render {
         return this.ctx;
     }
 
-    public reload(): void {
-        //
-    }
-
     protected drawFrame(): void {
         this.clear();
 

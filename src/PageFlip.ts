@@ -42,7 +42,7 @@ export class PageFlip extends EventObject {
      * @param {HTMLElement} inBlock - Root HTML Element
      * @param {Object} setting - Configuration object
      */
-    constructor(inBlock: HTMLElement, setting: Partial<FlipSetting>) {
+    constructor(inBlock: HTMLElement, setting: Record<string, number | string | boolean>) {
         super();
 
         this.setting = new Settings().getSettings(setting);
@@ -155,21 +155,12 @@ export class PageFlip extends EventObject {
         this.pages = new HTMLPageCollection(this, this.render, this.ui.getDistElement(), items);
         this.pages.load();
         (this.ui as HTMLUI).updateItems(items);
-        this.render.reload();
 
         this.pages.show(current);
         this.trigger('update', this, {
             page: current,
             mode: this.render.getOrientation(),
         });
-    }
-
-    /**
-     * Clear pages from HTML (remove to initinalState)
-     */
-    public clear(): void {
-        this.pages.destroy();
-        (this.ui as HTMLUI).clear();
     }
 
     /**
@@ -370,7 +361,7 @@ export class PageFlip extends EventObject {
      * @param {boolean} isTouch - True if there was a touch event, not a mouse click
      */
     public userMove(pos: Point, isTouch: boolean): void {
-        if (!this.isUserTouch && !isTouch && this.setting.showPageCorners) {
+        if (!this.isUserTouch && !isTouch) {
             this.flipController.showCorner(pos); // fold Page Corner
         } else if (this.isUserTouch) {
             if (Helper.GetDistanceBetweenTwoPoint(this.mousePosition, pos) > 5) {
