@@ -24,6 +24,7 @@ export class HTMLPageCollection extends PageCollection {
     }
 
     public load(): void {
+        // @ts-ignore
         for (const pageElement of this.pagesElement) {
             const page = new HTMLPage(
                 this.render,
